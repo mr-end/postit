@@ -1,0 +1,33 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: postit-prod
+
+resources:
+  - ../../base
+  - namespace.yaml
+  - pdb.yaml
+
+patches:
+  - path: configmap.yaml
+  # secret.yaml is intentionally NOT patched here — it's gitignored and applied
+  # out-of-band (kubectl apply), so Argo CD never needs it. See deploy/README.md.
+  - path: pvc.yaml
+  - path: route.yaml
+  - path: patches/backend-ha.yaml
+  - path: patches/frontend-ha.yaml
+
+images:
+  - name: postit-backend
+    newName: ghcr.io/mr-end/postit/postit-backend
+    newTag: "1.0.0"
+  - name: postit-frontend
+    newName: ghcr.io/mr-end/postit/postit-frontend
+    newTag: "1.0.0"
+
+labels:
+  - pairs:
+      environment: prod
+      app.kubernetes.io/instance: postit-prod
+      app.kubernetes.io/part-of: postit
+    includeSelectors: false

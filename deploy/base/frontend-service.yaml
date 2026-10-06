@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postit-frontend
+  labels:
+    app.kubernetes.io/name: postit-frontend
+    app.kubernetes.io/component: frontend
+spec:
+  selector:
+    app.kubernetes.io/name: postit-frontend
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http

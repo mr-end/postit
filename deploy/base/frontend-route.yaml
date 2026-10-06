@@ -1,0 +1,19 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: postit-frontend
+  labels:
+    app.kubernetes.io/name: postit-frontend
+    app.kubernetes.io/component: frontend
+spec:
+  host: REPLACE_ME_FRONTEND_HOST
+  to:
+    kind: Service
+    name: postit-frontend
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

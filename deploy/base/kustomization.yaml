@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - backend-deployment.yaml
+  - backend-service.yaml
+  - frontend-deployment.yaml
+  - frontend-service.yaml
+  - frontend-route.yaml
+  - mariadb-deployment.yaml
+  - mariadb-service.yaml
+  - mariadb-pvc.yaml
+  - mariadb-serviceaccount.yaml
+  - configmap.yaml
+  # NOTE: postit-db Secret is intentionally NOT a kustomize resource — it's
+  # gitignored and applied out-of-band (see deploy/overlays/*/secret.yaml.tpl
+  # and deploy/README.md). Referencing a gitignored file here would make Argo
+  # CD's `kustomize build` fail with "no such file or directory" on a clean
+  # git checkout.
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: postit-tasks
+    includeSelectors: false

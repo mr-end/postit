@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: postit-dev
+  labels:
+    app.kubernetes.io/part-of: postit
+    environment: dev
+    argocd.argoproj.io/managed-by: openshift-gitops

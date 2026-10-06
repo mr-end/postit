@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postit-frontend
+  labels:
+    app.kubernetes.io/name: postit-frontend
+    app.kubernetes.io/component: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postit-frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postit-frontend
+        app.kubernetes.io/component: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: postit-frontend:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: postit-config
+                  key: PORT
+            - name: API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: postit-config
+                  key: API_URL
+            - name: ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: postit-config
+                  key: ENV
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi

@@ -1,0 +1,5 @@
+site_name: Post-it Tasks
+site_description: Documentação do sistema de lembretes em estilo post-it
+nav:
+  - Home: index.md
+  - API: api.md

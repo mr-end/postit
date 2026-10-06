@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postit-config
+data:
+  DB_HOST: postit-mariadb
+  DB_PORT: "3306"
+  API_URL: http://postit-backend:8080
+  PORT: "3000"
+  ENV: dev

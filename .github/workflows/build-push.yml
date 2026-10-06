@@ -1,0 +1,68 @@
+name: Build & Push Images
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set image tag
+        id: tag
+        run: echo "sha_short=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Build & push backend
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/postit-backend:${{ steps.tag.outputs.sha_short }}
+            ${{ env.REGISTRY }}/${{ github.repository }}/postit-backend:latest
+
+      - name: Build & push frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/postit-frontend:${{ steps.tag.outputs.sha_short }}
+            ${{ env.REGISTRY }}/${{ github.repository }}/postit-frontend:latest
+
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v2
+
+      - name: Update DEV overlay image tags
+        run: |
+          cd deploy/overlays/dev
+          kustomize edit set image \
+            "postit-backend=${{ env.REGISTRY }}/${{ github.repository }}/postit-backend:${{ steps.tag.outputs.sha_short }}" \
+            "postit-frontend=${{ env.REGISTRY }}/${{ github.repository }}/postit-frontend:${{ steps.tag.outputs.sha_short }}"
+
+      - name: Commit & push to gitops branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add deploy/overlays/dev/kustomization.yaml
+          git diff --cached --quiet || git commit -m "ci: update DEV images to ${{ steps.tag.outputs.sha_short }}"
+          git push origin HEAD:gitops --force

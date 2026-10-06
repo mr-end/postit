@@ -1,0 +1,93 @@
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: postit-tasks
+  description: Post-it style reminder tasks
+  tags:
+    - quarkus
+    - nodejs
+    - mariadb
+spec:
+  owner: user:default/victorfim
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: postit-backend
+  description: API Quarkus for postit post-it tasks
+  tags:
+    - java
+    - quarkus
+    - rest
+    - mariadb
+  annotations:
+    backstage.io/source-location: url:./backend
+    backstage.io/techdocs-ref: dir:.
+    argocd/app-name: postit-dev
+    argocd/app-selector: rhdh-gitops=postit
+  links:
+    - url: https://postit-dev.apps.cluster-bxnhf.dyn.redhatworkshops.io
+      title: Frontend (DEV)
+      icon: catalog
+spec:
+  type: service
+  lifecycle: experimental
+  owner: user:default/victorfim
+  system: postit-tasks
+  providesApis:
+    - postit-api
+  dependsOn:
+    - resource:postit-mariadb
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: postit-frontend
+  description: Node.js frontend for postit
+  tags:
+    - nodejs
+    - express
+    - frontend
+  annotations:
+    backstage.io/source-location: url:./frontend
+    argocd/app-name: postit-dev
+    argocd/app-selector: rhdh-gitops=postit
+spec:
+  type: website
+  lifecycle: experimental
+  owner: user:default/victorfim
+  system: postit-tasks
+  consumesApis:
+    - postit-api
+  dependsOn:
+    - component:postit-backend
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: postit-api
+  description: REST API for postit post-it tasks
+  tags:
+    - rest
+    - openapi
+spec:
+  type: openapi
+  lifecycle: experimental
+  owner: user:default/victorfim
+  system: postit-tasks
+  definition:
+    $text: ./openapi.yaml
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: postit-mariadb
+  description: MariaDB database for postit
+  tags:
+    - mariadb
+    - database
+spec:
+  type: database
+  lifecycle: experimental
+  owner: user:default/victorfim
+  system: postit-tasks
