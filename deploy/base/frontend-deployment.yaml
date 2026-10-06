@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: postit-frontend:1.0.0
+          image: postit-frontend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

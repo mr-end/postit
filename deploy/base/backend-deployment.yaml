@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: postit-backend:1.0.0
+          image: postit-backend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
