@@ -19,10 +19,10 @@ patches:
 images:
 - name: postit-backend
   newName: ghcr.io/mr-end/postit/postit-backend
-  newTag: 4662bce
+  newTag: latest
 - name: postit-frontend
   newName: ghcr.io/mr-end/postit/postit-frontend
-  newTag: 4662bce
+  newTag: latest
 
 labels:
 - pairs:
